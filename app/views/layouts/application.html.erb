@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Pub</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>
+    <%= javascript_pack_tag 'application', 'data-turbolinks-track': 'reload' %>
+    <link
+      rel="stylesheet"
+      href="https://use.fontawesome.com/releases/v5.14.0/css/all.css"
+      integrity="sha384-HzLeBuhoNPvSl5KYnjx0BT+WB0QEEqLprO+NBkkk5gbc67FTaL7XIGa2w1L0Xbgc"
+      crossorigin="anonymous"
+    />
+  </head>
+
+  <body>
+    <%= render partial: 'shared/navbar' %>
+    
+    <div class="container-fluid px-5 mt-3 w-100">
+      <%= content_tag :p, notice, class: "alert alert-info" if notice.present? %>
+      <%= content_tag :p, alert, class: "alert alert-warning" if alert.present? %>
+
+      <%= yield %>
+    </div>
+  </body>
+</html>
