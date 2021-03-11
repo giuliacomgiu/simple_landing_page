@@ -1,21 +1,39 @@
-FROM ruby:2.7.2-slim-buster
-RUN apt-get update -qq && apt-get install -y build-essential
-RUN apt-get install -y libxml2-dev libxslt1-dev
-RUN apt-get install -y nodejs
-RUN apt-get install -y yarn
-RUN apt-get install  -y sqlite3 libsqlite3-dev
-#RUN apk add zlib-dev libxml2-dev libxslt-dev 
-#RUN apk add nodejs=14.16.0-r0
-#RUN apk add yarn=1.22.10-r0
-#RUN apk add sqlite
-#RUN gem install rails -v 6.1.3
-RUN gem install bundler -v 2.1.4
+FROM ruby:2.7.2-alpine
 
-WORKDIR /app
-COPY Gemfile Gemfile.lock ./
-RUN bundle install
-CMD ["/bin/setup"]
+ENV APP_PATH /var/app
+ENV BUNDLE_VERSION 2.1.4
+ENV BUNDLE_PATH /usr/local/bundle/gems
+ENV TMP_PATH /tmp/
+ENV RAILS_LOG_TO_STDOUT true
+ENV RAILS_PORT 3000
 
-ADD . .
-EXPOSE 3000
-CMD ["rails", "server"]
+# copy entrypoint scripts and grant execution permissions
+COPY ./dev-docker-entrypoint.sh /usr/local/bin/dev-entrypoint.sh
+RUN chmod +x /usr/local/bin/dev-entrypoint.sh
+
+# install dependencies for application
+RUN apk -U add --no-cache \
+build-base \
+git \
+libxml2-dev \
+libxslt-dev \
+nodejs \
+yarn \
+imagemagick \
+tzdata \
+less \
+sqlite \
+sqlite-dev \ 
+&& rm -rf /var/cache/apk/* \
+&& mkdir -p $APP_PATH 
+
+
+RUN gem install bundler --version "$BUNDLE_VERSION" \
+&& rm -rf $GEM_HOME/cache/*
+
+# navigate to app directory
+WORKDIR $APP_PATH
+
+EXPOSE $RAILS_PORT
+
+ENTRYPOINT [ "bundle", "exec" ]
